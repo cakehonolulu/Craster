@@ -74,7 +74,7 @@ int main(char argc, char **argv)
     float fFar = 1000.0f;
     float fFov = 90.0f;
     float fAspectRatio = WIDTH / HEIGHT;
-    float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
+    float fFovRad = 1.0f / tan(fFov * 0.5f / 180.0f * 3.14159f);
 
     mat4x4 matProj = {0};
 
@@ -110,21 +110,21 @@ int main(char argc, char **argv)
         SDL_RenderClear(renderer);
 
         mat4x4 matRotZ = {0}, matRotX = {0};
-        fTheta += 1.0f * 0.05;
+        fTheta += 1.0f * 0.5;
 
-        matRotZ.m[0][0] = cosf(fTheta);
-        matRotZ.m[0][1] = sinf(fTheta);
-        matRotZ.m[1][0] = -sinf(fTheta);
-        matRotZ.m[1][1] = cosf(fTheta);
+        matRotZ.m[0][0] = cos(1);
+        matRotZ.m[0][1] = -sin(90);
+        matRotZ.m[1][0] = sin(1);
+        matRotZ.m[1][1] = cos(1);
         matRotZ.m[2][2] = 1;
         matRotZ.m[3][3] = 1;
 
         matRotX.m[0][0] = 1;
-        matRotX.m[1][1] = cosf(fTheta * 0.5f);
-        matRotX.m[1][2] = sinf(fTheta * 0.5f);
-        matRotX.m[2][1] = -sinf(fTheta * 0.5f);
-        matRotX.m[2][2] = cosf(fTheta * 0.5f);
-        matRotX.m[3][3] = 1;
+        matRotX.m[1][1] = -cos(fTheta * 0.1f);
+        matRotX.m[1][2] = -sin(fTheta * 0.1f);
+        matRotX.m[2][1] = sin(fTheta * 0.1f);
+        matRotX.m[2][2] = -cos(fTheta * 0.1f);
+        matRotX.m[3][3] = 0;
 
         red   = sin(frequency*currentcol + 0) * 127 + 128;
         green = sin(frequency*currentcol + 2) * 127 + 128;
@@ -255,6 +255,7 @@ int main(char argc, char **argv)
 #endif
             }
         }
+
 
         SDL_RenderPresent(renderer);
 
