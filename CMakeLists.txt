@@ -6,6 +6,11 @@ set(CMAKE_C_FLAGS_MINSIZEREL "-Wall -Wextra -O0")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "-Wall -Wextra -g -O2")
 set(CMAKE_C_FLAGS_RELEASE "-Wall -Wextra -O2")
 
+if (ASAN)
+add_compile_options(-fsanitize=address -g)
+add_link_options(-fsanitize=address)
+endif()
+
 find_package(SDL2 REQUIRED)
 
 include_directories(${SDL2_INCLUDE_DIRS} "include/")
@@ -22,4 +27,4 @@ foreach (TMP_PATH ${SRC_FILES})
 endforeach(TMP_PATH)
 
 add_executable(craster ${SRC_FILES})
-target_link_libraries(craster ${SDL2_LIBRARIES})
+target_link_libraries(craster m ${SDL2_LIBRARIES})
