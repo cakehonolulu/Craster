@@ -9,3 +9,6 @@ cmake_install.cmake
 
 /* Binary Files */
 craster
+
+/* Extraneous Files */
+null.d
