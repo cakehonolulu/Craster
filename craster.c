@@ -93,6 +93,7 @@ int main(char argc, char **argv)
 
     unsigned char red, green, blue;
 
+    vec3 vCamera = {0};
 
     while (1)
     {
@@ -153,47 +154,116 @@ int main(char argc, char **argv)
 
             triTranslated = triRotatedZX;
 
-            triTranslated.p[0].z = triRotatedZX.p[0].z + 3.0f;
-            triTranslated.p[1].z = triRotatedZX.p[1].z + 3.0f;
-            triTranslated.p[2].z = triRotatedZX.p[2].z + 3.0f;
+            triTranslated.p[0].z = triRotatedZX.p[0].z + 5.0f;
+            triTranslated.p[1].z = triRotatedZX.p[1].z + 5.0f;
+            triTranslated.p[2].z = triRotatedZX.p[2].z + 5.0f;
 
+            vec3 normal, line1, line2;
+
+            line1.x = triTranslated.p[1].x - triTranslated.p[0].x;
+            line1.y = triTranslated.p[1].y - triTranslated.p[0].y;
+            line1.z = triTranslated.p[1].z - triTranslated.p[0].z;
+
+            line2.x = triTranslated.p[2].x - triTranslated.p[0].x;
+            line2.y = triTranslated.p[2].y - triTranslated.p[0].y;
+            line2.z = triTranslated.p[2].z - triTranslated.p[0].z;
+
+            normal.x = line1.y * line2.z - line1.z * line2.y;
+            normal.y = line1.z * line2.x - line1.x * line2.z;
+            normal.z = line1.x * line2.y - line1.y * line2.x;
+
+            float l = sqrtf(normal.x*normal.x + normal.y * normal.y + normal.z * normal.z);
+            normal.x /= l;
+            normal.y /= l;
+            normal.z /= l;
+
+            //if (normal.z < 0)
+            if (normal.x * (triTranslated.p[0].x - vCamera.x) + 
+                normal.y * (triTranslated.p[0].y - vCamera.y) +
+                normal.z * (triTranslated.p[0].z - vCamera.z) < 0.0f)
+            {
+
+                vec3 light_direction = { 0.0f, 0.0f, -1.0 };
+
+                float l = sqrtf(light_direction.x*light_direction.x + light_direction.y * light_direction.y + light_direction.z * light_direction.z);
+                light_direction.x /= l;
+                light_direction.y /= l;
+                light_direction.z /= l;
+
+                float dp = normal.x * light_direction.x + normal.y * light_direction.y +  normal.z * light_direction.z;
+                
 #ifndef TRIANG
-            MultiplyMatrixVector(&triTranslated.p[0], &triProjected.p[0], &matProj);
-            MultiplyMatrixVector(&triTranslated.p[1], &triProjected.p[1], &matProj);
-            MultiplyMatrixVector(&triTranslated.p[2], &triProjected.p[2], &matProj);
+                MultiplyMatrixVector(&triTranslated.p[0], &triProjected.p[0], &matProj);
+                MultiplyMatrixVector(&triTranslated.p[1], &triProjected.p[1], &matProj);
+                MultiplyMatrixVector(&triTranslated.p[2], &triProjected.p[2], &matProj);
 #else
-            MultiplyMatrixVector(&mesh2->p[0], &triProjected.p[0], &matProj);
-            MultiplyMatrixVector(&mesh2->p[1], &triProjected.p[1], &matProj);
-            MultiplyMatrixVector(&mesh2->p[2], &triProjected.p[2], &matProj);
+                MultiplyMatrixVector(&mesh2->p[0], &triProjected.p[0], &matProj);
+                MultiplyMatrixVector(&mesh2->p[1], &triProjected.p[1], &matProj);
+                MultiplyMatrixVector(&mesh2->p[2], &triProjected.p[2], &matProj);
 #endif
 
-            triProjected.p[0].x += 1.0f;
-            triProjected.p[0].y += 1.0f;
-            triProjected.p[1].x += 1.0f;
-            triProjected.p[1].y += 1.0f;
-            triProjected.p[2].x += 1.0f;
-            triProjected.p[2].y += 1.0f;
+                triProjected.p[0].x += 1.0f; triProjected.p[0].y += 1.0f;
+                triProjected.p[1].x += 1.0f; triProjected.p[1].y += 1.0f;
+                triProjected.p[2].x += 1.0f; triProjected.p[2].y += 1.0f;
 
-            triProjected.p[0].x *= 0.5f * WIDTH;
-            triProjected.p[0].y *= 0.5f * HEIGHT;
-            triProjected.p[1].x *= 0.5f * WIDTH;
-            triProjected.p[1].y *= 0.5f * HEIGHT;
-            triProjected.p[2].x *= 0.5f * WIDTH;
-            triProjected.p[2].y *= 0.5f * HEIGHT;
+                triProjected.p[0].x *= 0.5f * WIDTH;
+                triProjected.p[0].y *= 0.5f * HEIGHT;
+                triProjected.p[1].x *= 0.5f * WIDTH;
+                triProjected.p[1].y *= 0.5f * HEIGHT;
+                triProjected.p[2].x *= 0.5f * WIDTH;
+                triProjected.p[2].y *= 0.5f * HEIGHT;
 
-            SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-            draw_tri(triProjected, renderer);
+                SDL_FPoint p1, p2, p3;
+                SDL_Color c1, c2, c3;
+                
+                c1.r = 255;
+                c1.g = 0;
+                c1.b = 0;
+                c1.a = 255;
+
+                c2.r = 0;
+                c2.g = 0;
+                c2.b = 255;
+                c2.a = 255;
+
+                c3.r = 0;
+                c3.g = 255;
+                c3.b = 0;
+                c3.a = 255;
+
+                p1.x = triProjected.p[0].x;
+                p1.y = triProjected.p[0].y;
+
+                p2.x = triProjected.p[1].x;
+                p2.y = triProjected.p[1].y;
+
+                p3.x = triProjected.p[2].x;
+                p3.y = triProjected.p[2].y;
+
+                SDL_Vertex vertex[3] = {
+                    { p1, c1, 0 },
+                    { p2, c2, 0 },
+                    { p3, c3, 0 }
+                };
+
+                SDL_RenderGeometry( renderer, NULL, &vertex[0], sizeof(vertex), NULL, 0 );
+
+#ifndef NO_WIREFRAME
+                draw_tri(triProjected, renderer);
+#endif
+            }
         }
 
-            SDL_RenderPresent(renderer);
+        SDL_RenderPresent(renderer);
 
-            unsigned long long end = SDL_GetPerformanceCounter();
+        unsigned long long end = SDL_GetPerformanceCounter();
 
-	        elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
+	    elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
 
-            // Cap to 60 FPS
-            SDL_Delay(floor(16.666f - elapsedMS));
+        // Cap to 60 FPS
+        SDL_Delay(floor(16.666f - elapsedMS));
     }
 
     return 0;
