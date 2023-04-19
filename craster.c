@@ -95,6 +95,8 @@ int main(char argc, char **argv)
 
     vec3 vCamera = {0};
 
+    unsigned char frames = 0;
+
     while (1)
     {
         unsigned long long start = SDL_GetPerformanceCounter();
@@ -112,19 +114,19 @@ int main(char argc, char **argv)
         mat4x4 matRotZ = {0}, matRotX = {0};
         fTheta += 1.0f * 0.5;
 
-        matRotZ.m[0][0] = cos(1);
-        matRotZ.m[0][1] = -sin(90);
-        matRotZ.m[1][0] = sin(1);
-        matRotZ.m[1][1] = cos(1);
+        matRotZ.m[0][0] = cos(fTheta);
+        matRotZ.m[0][1] = sin(fTheta);
+        matRotZ.m[1][0] = -sin(fTheta);
+        matRotZ.m[1][1] = cos(fTheta);
         matRotZ.m[2][2] = 1;
         matRotZ.m[3][3] = 1;
 
-        matRotX.m[0][0] = 1;
-        matRotX.m[1][1] = -cos(fTheta * 0.1f);
-        matRotX.m[1][2] = -sin(fTheta * 0.1f);
-        matRotX.m[2][1] = sin(fTheta * 0.1f);
-        matRotX.m[2][2] = -cos(fTheta * 0.1f);
-        matRotX.m[3][3] = 0;
+        matRotX.m[0][0] = cos(fTheta * 0.1f);
+        matRotX.m[0][2] = -sin(fTheta * 0.1f);
+        matRotX.m[1][1] = 1;
+        matRotX.m[2][0] = sin(fTheta * 0.1f);
+        matRotX.m[2][2] = cos(fTheta * 0.1f);
+        matRotX.m[3][3] = 1;
 
         red   = sin(frequency*currentcol + 0) * 127 + 128;
         green = sin(frequency*currentcol + 2) * 127 + 128;
@@ -147,9 +149,9 @@ int main(char argc, char **argv)
             MultiplyMatrixVector(&mesh[i].p[1], &triRotatedZ.p[1], &matRotZ);
             MultiplyMatrixVector(&mesh[i].p[2], &triRotatedZ.p[2], &matRotZ);
 
-            MultiplyMatrixVector(&triRotatedZ.p[0], &triRotatedZX.p[0], &matRotX);
-            MultiplyMatrixVector(&triRotatedZ.p[1], &triRotatedZX.p[1], &matRotX);
-            MultiplyMatrixVector(&triRotatedZ.p[2], &triRotatedZX.p[2], &matRotX);
+            MultiplyMatrixVector(&mesh[i].p[0], &triRotatedZX.p[0], &matRotX);
+            MultiplyMatrixVector(&mesh[i].p[1], &triRotatedZX.p[1], &matRotX);
+            MultiplyMatrixVector(&mesh[i].p[2], &triRotatedZX.p[2], &matRotX);
 
 
             triTranslated = triRotatedZX;
@@ -263,9 +265,21 @@ int main(char argc, char **argv)
 
 	    elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
 
-        printf("Elapsed MS: %f ms\n", elapsedMS);
+        char string[64];
+        snprintf(string, 64, "Craster | %.02f FPS, (%.04f ms/f)", ((1/elapsedMS) * 1000), elapsedMS);
 
-        if (16.666f - elapsedMS > 0) SDL_Delay(floor(16.666f - elapsedMS));
+        if (16.666f - elapsedMS > 0)
+        {
+            SDL_Delay(floor(16.666f - elapsedMS));
+        }
+
+        if (frames >= 60)
+        {
+            frames = 0;
+            SDL_SetWindowTitle(window, string);
+        }
+
+        frames++;
     }
 
     return 0;
