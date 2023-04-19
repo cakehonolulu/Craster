@@ -263,8 +263,9 @@ int main(char argc, char **argv)
 
 	    elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
 
-        // Cap to 60 FPS
-        SDL_Delay(floor(16.666f - elapsedMS));
+        printf("Elapsed MS: %f ms\n", elapsedMS);
+
+        if (16.666f - elapsedMS > 0) SDL_Delay(floor(16.666f - elapsedMS));
     }
 
     return 0;
