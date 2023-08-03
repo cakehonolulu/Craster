@@ -250,7 +250,7 @@ int main(char argc, char **argv)
                     { p3, c3, 0 }
                 };
 
-                SDL_RenderGeometry( renderer, NULL, &vertex[0], sizeof(vertex), NULL, 0 );
+                SDL_RenderGeometry( renderer, NULL, &vertex[0], 3, NULL, 0 );
 
 #ifndef NO_WIREFRAME
                 draw_tri(triProjected, renderer);
